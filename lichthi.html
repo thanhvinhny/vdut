@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VNY | DUT - DS PHÒNG THI</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #ffffff; color: #000000; }
+        
+        .btn-home-back {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            background-color: #ffffff;
+            border: 1px solid #000000;
+            cursor: pointer;
+            text-decoration: none;
+            color: #000000;
+            transition: all 0.2s ease;
+        }
+        .btn-home-back:hover { background-color: #f2f2f2; }
+
+        .header { 
+            border-bottom: 1px solid #000000; 
+            padding-bottom: 10px; 
+            margin-bottom: 10px; 
+            padding-left: 50px; 
+            min-height: 35px;
+        }
+        .header h1 { margin: 0; font-size: 22px; }
+        table { width: 100%; border: 1px solid #000000; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 8px; border: 1px solid #000000; text-align: left; font-size: 14px; }
+        th { background-color: #f2f2f2; }
+        button { padding: 4px 10px; cursor: pointer; background-color: #ffffff; border: 1px solid #000; font-weight: bold; }
+        button:hover { background-color: #f2f2f2; }
+        .btn-back { margin-top: 10px; }
+        #searchInput { width: 100%; padding: 10px; margin-bottom: 10px; box-sizing: border-box; border: 1px solid #000; font-size: 14px; }
+        .page { display: none; }
+        .active-page { display: block; }
+        .room-tag { color: #bd1c1c; font-weight: bold; }
+        .time-tag { color: #555; font-size: 12px; display: block; margin-top: 2px; }
+        .pagination { margin-top: 15px; text-align: right; }
+        .sub-info { margin: 10px 0; font-size: 15px; line-height: 1.6; }
+    </style>
+</head>
+<body>
+
+    <a href="./trangchusv.html" class="btn-home-back" title="Quay lại Dut SuperApp">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+    </a>
+
+    <div class="header">
+        <h1 id="pageTitle">VNY | DUT - DS PHÒNG THI | Học kỳ 2 (2025-2026)</h1>
+        <button id="backBtn" class="btn-back" style="display: none;" onclick="showMainPage()">Quay lại danh sách</button>
+    </div>
+
+    <div id="mainPage" class="page active-page">
+        <input type="text" id="searchInput" onkeyup="searchSubjects()" placeholder="Tìm kiếm bằng MSSV* hoặc tên học phần...">
+        <table id="subjectsTable">
+            <thead>
+                <tr>
+                    <th style="width: 5%">STT</th>
+                    <th style="width: 50%">Tên học phần</th>
+                    <th style="width: 30%">Thông tin</th>
+                    <th style="width: 15%; text-align: center;">DSSV</th>
+                </tr>
+            </thead>
+            <tbody id="subjectsBody"></tbody>
+        </table>
+        <div class="pagination">
+            <span id="pageInfo"></span>
+            <button onclick="prevPage()">Trang trước</button>
+            <button onclick="nextPage()">Trang sau</button>
+        </div>
+    </div>
+
+    <div id="detailPage" class="page">
+        <div id="statusArea" class="sub-info"></div>
+        <table id="studentsTable">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>MSSV</th>
+                    <th>Họ và tên</th>
+                    <th>Ngày sinh</th>
+                    <th>Lớp sinh hoạt</th>
+                </tr>
+            </thead>
+            <tbody id="studentsBody"></tbody>
+        </table>
+    </div>
+
+<script src="databasethi.js"></script>
+
+<script>
+    let subjectsList = [];   
+    let filteredData = [];   
+    let studentsMap = {};    
+    
+    let currentPage = 1;
+    const rowsPerPage = 20;
+
+    function init() {
+        if (typeof examDatabaseRaw === 'undefined') {
+            alert("Không tìm thấy file databasethi.js hoặc dữ liệu trống!");
+            return;
+        }
+
+        // Đọc MSSV từ bộ nhớ đệm
+        const mssvCheck = localStorage.getItem('saved_mssv');
+        const uniqueSubjects = {};
+        
+        // Tạo một vùng lưu trữ tạm thời để kiểm tra xem phòng thi/môn học đó có chứa MSSV hay không
+        const roomsValidForStudent = {};
+
+        if (mssvCheck) {
+            // Bước lọc trung gian: Xác định xem maCa nào có chứa sinh viên này
+            examDatabaseRaw.trim().split('\n').forEach(line => {
+                if (!line.trim()) return;
+                const parts = line.split('|');
+                if (parts.length >= 11) {
+                    const maCaId = parts[0].trim();
+                    const masv   = parts[7].trim();
+                    if (masv === mssvCheck.trim()) {
+                        roomsValidForStudent[maCaId] = true;
+                    }
+                }
+            });
+        }
+
+        examDatabaseRaw.trim().split('\n').forEach(line => {
+            if (!line.trim()) return;
+            const parts = line.split('|');
+            if (parts.length >= 11) {
+                const maCaId   = parts[0].trim();
+                
+                // LOGIC LỌC: Nếu ở chế độ Sinh viên mà mã ca này không chứa MSSV của bạn -> Bỏ qua toàn bộ dòng này
+                if (mssvCheck && !roomsValidForStudent[maCaId]) {
+                    return;
+                }
+
+                const caThi    = parts[1].trim();
+                const tenMon   = parts[2].trim();
+                const ngayThi  = parts[3].trim();
+                const gioThi   = parts[4].trim();
+                const phongThi = parts[5].trim();
+                
+                const student = {
+                    stt: parts[6].trim(),
+                    masv: parts[7].trim(),
+                    hoten: parts[8].trim(),
+                    ngaysinh: parts[9].trim(),
+                    lopsh: parts[10].trim()
+                };
+
+                if (!uniqueSubjects[maCaId]) {
+                    uniqueSubjects[maCaId] = {
+                        maCa: maCaId,
+                        ca: caThi,
+                        name: tenMon,
+                        ngay: ngayThi,
+                        gio: gioThi,
+                        phong: phongThi
+                    };
+                }
+
+                if (!studentsMap[maCaId]) {
+                    studentsMap[maCaId] = [];
+                }
+                studentsMap[maCaId].push(student);
+            }
+        });
+
+        subjectsList = Object.values(uniqueSubjects).map((item, index) => {
+            return { stt: index + 1, ...item };
+        });
+
+        filteredData = [...subjectsList];
+        renderTable();
+    }
+
+    function renderTable() {
+        const tbody = document.getElementById('subjectsBody');
+        tbody.innerHTML = '';
+        const start = (currentPage - 1) * rowsPerPage;
+        const paginatedItems = filteredData.slice(start, start + rowsPerPage);
+
+        paginatedItems.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${item.stt}</td>
+                <td><strong>${item.name}</strong></td>
+                <td>
+                    <span class="room-tag">Phòng: ${item.phong}</span>
+                    <span class="time-tag">Ngày: ${item.ngay} | Ca: ${item.ca} (${item.gio})</span>
+                </td>
+                <td style="text-align:center;">
+                    <button onclick="loadStudents('${item.maCa}')">XEM</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+        document.getElementById('pageInfo').innerText = `Trang ${currentPage} / ${Math.ceil(filteredData.length / rowsPerPage) || 1}`;
+    }
+
+    function searchSubjects() {
+        const filter = document.getElementById('searchInput').value.toUpperCase().trim();
+        
+        if (!filter) {
+            filteredData = [...subjectsList];
+        } else {
+            filteredData = subjectsList.filter(item => {
+                const matchSubjectName = item.name.toUpperCase().includes(filter);
+                const studentsInRoom = studentsMap[item.maCa] || [];
+                const matchStudentId = studentsInRoom.some(sv => sv.masv.toUpperCase().includes(filter));
+                return matchSubjectName || matchStudentId;
+            });
+        }
+        
+        filteredData = filteredData.map((item, index) => {
+            return { ...item, stt: index + 1 };
+        });
+
+        currentPage = 1;
+        renderTable();
+    }
+
+    function loadStudents(maCaId) {
+        const subjectInfo = subjectsList.find(i => i.maCa === maCaId);
+        if (!subjectInfo) return;
+
+        document.getElementById('mainPage').classList.remove('active-page');
+        document.getElementById('detailPage').classList.add('active-page');
+        document.getElementById('backBtn').style.display = 'inline-block';
+        document.getElementById('pageTitle').innerText = subjectInfo.name;
+
+        const statusArea = document.getElementById('statusArea');
+        const studentsBody = document.getElementById('studentsBody');
+
+        studentsBody.innerHTML = '';
+        const listSV = studentsMap[maCaId] || [];
+
+        statusArea.innerHTML = `
+            <div>Phòng thi: <strong class="room-tag">${subjectInfo.phong}</strong> | Ca thi: <strong>${subjectInfo.ca} (${subjectInfo.gio})</strong> | Ngày thi: <strong>${subjectInfo.ngay}</strong></div>
+            <div>Tổng số sinh viên trong phòng: <strong>${listSV.length}</strong></div>
+        `;
+
+        listSV.sort((a, b) => parseInt(a.stt) - parseInt(b.stt));
+
+        listSV.forEach(sv => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${sv.stt}</td><td>${sv.masv}</td><td>${sv.hoten}</td><td>${sv.ngaysinh}</td><td>${sv.lopsh}</td>`;
+            studentsBody.appendChild(tr);
+        });
+    }
+
+    function showMainPage() {
+        document.getElementById('detailPage').classList.remove('active-page');
+        document.getElementById('mainPage').classList.add('active-page');
+        document.getElementById('backBtn').style.display = 'none';
+        document.getElementById('pageTitle').innerText = 'VNY | DUT - DS PHÒNG THI';
+    }
+
+    function prevPage() { if (currentPage > 1) { currentPage--; renderTable(); } }
+    function nextPage() { if (currentPage * rowsPerPage < filteredData.length) { currentPage++; renderTable(); } }
+
+    window.onload = init;
+</script>
+</body>
+</html>
