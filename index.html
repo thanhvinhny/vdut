@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VDUT - ALL IN ONE</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #ffffff;
+        }
+        .container {
+            text-align: center;
+            width: 90%;
+            max-width: 500px;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+            letter-spacing: 2px;
+        }
+        .subtitle {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        hr {
+            width: 100%;
+            border: 0;
+            border-top: 1px solid #ccc;
+            margin-bottom: 40px;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px 0;
+            margin: 15px 0;
+            font-size: 1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            background-color: #ffffff;
+            border: 2px solid #000000;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: #000000;
+        }
+        .btn:hover {
+            background-color: #000000;
+            color: #ffffff;
+        }
+        .box-nhap {
+            display: none;
+            margin-top: 20px;
+        }
+        input {
+            width: 90%;
+            padding: 12px;
+            font-size: 1rem;
+            border: 2px solid #000;
+            border-radius: 4px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>VDUT</h1>
+    <div class="subtitle">DUT - SUPERAPP ALL IN ONE</div>
+    <hr>
+
+    <div id="chon-doi-tuong">
+        <p style="font-weight: bold; margin-bottom: 20px;">BẠN LÀ?</p>
+        <button class="btn" onclick="hienNhapMssv()">Sinh viên DUT</button>
+        <a href="./trangchusv.html?role=khach" class="btn">Khách</a> 
+    </div>
+
+    <div id="nhap-mssv" class="box-nhap">
+        <p style="font-weight: bold; margin-bottom: 15px;">NHẬP MSSV CỦA BẠN</p>
+        <input type="text" id="txtMssv" placeholder="Nhập mã số sinh viên...">
+        <button class="btn" onclick="vaoAppSinhVien()">XÁC NHẬN VÀO APP</button>
+        <button style="border:none; background:none; cursor:pointer; text-decoration:underline; color:#666;" onclick="quayLai()">Quay lại</button>
+    </div>
+</div>
+
+<script>
+    function hienNhapMssv() {
+        document.getElementById('chon-doi-tuong').style.display = 'none';
+        document.getElementById('nhap-mssv').style.display = 'block';
+        document.getElementById('txtMssv').focus();
+    }
+
+    function quayLai() {
+        document.getElementById('chon-doi-tuong').style.display = 'block';
+        document.getElementById('nhap-mssv').style.display = 'none';
+    }
+
+    function vaoAppSinhVien() {
+        const mssv = document.getElementById('txtMssv').value.trim();
+        if (mssv === "") {
+            alert("Vui lòng nhập MSSV!");
+            return;
+        }
+        localStorage.setItem('saved_mssv', mssv);
+        window.location.href = './trangchusv.html';
+    }
+</script>
+
+</body>
+</html>
