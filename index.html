@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VDUT - ALL IN ONE</title>
+    <title>VDUT</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -77,7 +77,7 @@
 
 <div class="container">
     <h1>VDUT</h1>
-    <div class="subtitle">DUT - SUPERAPP ALL IN ONE</div>
+    <div class="subtitle">DUT STUDENTS</div>
     <hr>
 
     <div id="chon-doi-tuong">
@@ -94,6 +94,8 @@
     </div>
 </div>
 
+<script src="databasethi.js"></script>
+
 <script>
     function hienNhapMssv() {
         document.getElementById('chon-doi-tuong').style.display = 'none';
@@ -107,12 +109,34 @@
     }
 
     function vaoAppSinhVien() {
-        const mssv = document.getElementById('txtMssv').value.trim();
-        if (mssv === "") {
+        const mssvInput = document.getElementById('txtMssv').value.trim();
+        if (mssvInput === "") {
             alert("Vui lòng nhập MSSV!");
             return;
         }
-        localStorage.setItem('saved_mssv', mssv);
+
+        let hoTenTimDuoc = "Sinh Viên"; 
+
+        if (typeof examDatabaseRaw !== 'undefined') {
+            const lines = examDatabaseRaw.trim().split('\n');
+            for (let i = 0; i < lines.length; i++) {
+                if (!lines[i].trim()) continue;
+                const parts = lines[i].split('|');
+                if (parts.length >= 11) {
+                    const masv = parts[7].trim();
+                    const hoten = parts[8].trim();
+                    
+                    if (masv === mssvInput) {
+                        hoTenTimDuoc = hoten;
+                        break; // Tìm thấy tên rồi thì dừng vòng lặp
+                    }
+                }
+            }
+        }
+
+        localStorage.setItem('saved_mssv', mssvInput);
+        localStorage.setItem('saved_hoten', hoTenTimDuoc);
+        
         window.location.href = './trangchusv.html';
     }
 </script>
