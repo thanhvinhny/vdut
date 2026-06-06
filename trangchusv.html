@@ -152,17 +152,19 @@
     </div>
 </div>
 
+<script src="./database.js"></script>
+<script src="./databasethi.js"></script>
 <script>
     var thamSoUrl = new URLSearchParams(window.location.search);
     var laKhach = thamSoUrl.get('role') === 'khach';
     var mssvHienTai = "";
     var hoTenHienTai = "";
+    var tuDongNgaySinh = "Chưa cập nhật";
+    var tuDongLop = "Chưa cập nhật";
 
     if (laKhach) {
         localStorage.removeItem('saved_mssv');
         localStorage.removeItem('saved_hoten');
-        localStorage.removeItem('saved_ngaysinh');
-        localStorage.removeItem('saved_lop');
         document.getElementById('txtCheDo').innerText = "Khách";
     } else {
         mssvHienTai = localStorage.getItem('saved_mssv');
@@ -174,27 +176,41 @@
             var el = document.getElementById('txtCheDo');
             el.innerText = "Sinh viên: " + hoTenHienTai + " | MSSV: " + mssvHienTai;
             el.classList.add('bam-duoc');
+            
+            if (typeof database !== 'undefined') {
+                var timKiemDb = database.find(function(item) {
+                    return item.mssv === mssvHienTai;
+                });
+                if (timKiemDb && timKiemDb.lopSH) {
+                    tuDongLop = timKiemDb.lopSH;
+                }
+            }
+            
+            if (typeof examDatabaseRaw !== 'undefined') {
+                var dongLichThi = examDatabaseRaw.split('\n');
+                for (var i = 0; i < dongLichThi.length; i++) {
+                    var cot = dongLichThi[i].split('|');
+                    if (cot.length >= 12) {
+                        var mssvThi = cot[7].trim();
+                        if (mssvThi === mssvHienTai) {
+                            tuDongNgaySinh = cot[9].trim();
+                            tuDongLop = cot[10].trim();
+                            break;
+                        }
+                    }
+                }
+            }
         }
     }
 
     function handleCheDoClick() {
         if (laKhach || !mssvHienTai) return;
         
-        var ngaysinh = localStorage.getItem('saved_ngaysinh');
-        var lop = localStorage.getItem('saved_lop');
-        
-        if (!ngaysinh || ngaysinh.trim() === "" || ngaysinh === "null" || ngaysinh === "undefined") {
-            ngaysinh = "Chưa cập nhật";
-        }
-        if (!lop || lop.trim() === "" || lop === "null" || lop === "undefined") {
-            lop = "Chưa cập nhật";
-        }
-        
         document.getElementById('mdHoten').innerText = hoTenHienTai;
         document.getElementById('mdMssv').innerText = mssvHienTai;
-        document.getElementById('mdNgaysinh').innerText = ngaysinh;
+        document.getElementById('mdNgaysinh').innerText = tuDongNgaySinh;
         document.getElementById('mdEmail').innerText = mssvHienTai + "@sv1.dut.udn.vn";
-        document.getElementById('mdLop').innerText = lop;
+        document.getElementById('mdLop').innerText = tuDongLop;
         
         document.getElementById('studentModal').style.display = 'flex';
     }
@@ -206,8 +222,6 @@
     function thoatApp() {
         localStorage.removeItem('saved_mssv');
         localStorage.removeItem('saved_hoten');
-        localStorage.removeItem('saved_ngaysinh');
-        localStorage.removeItem('saved_lop');
         window.location.href = './index.html';
     }
 </script>
