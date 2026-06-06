@@ -6,7 +6,6 @@
     <title>VNY | DUT - DS PHÒNG THI</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #ffffff; color: #000000; }
-        
         .btn-home-back {
             position: absolute;
             top: 20px;
@@ -24,7 +23,6 @@
             transition: all 0.2s ease;
         }
         .btn-home-back:hover { background-color: #f2f2f2; }
-
         .header { 
             border-bottom: 1px solid #000000; 
             padding-bottom: 10px; 
@@ -101,12 +99,11 @@
 <script src="databasethi.js"></script>
 
 <script>
-    let subjectsList = [];   
-    let filteredData = [];   
-    let studentsMap = {};    
-    
-    let currentPage = 1;
-    const rowsPerPage = 20;
+    var subjectsList = [];   
+    var filteredData = [];   
+    var studentsMap = {};    
+    var currentPage = 1;
+    var rowsPerPage = 20;
 
     function init() {
         if (typeof examDatabaseRaw === 'undefined') {
@@ -114,46 +111,42 @@
             return;
         }
 
-        // Đọc MSSV từ bộ nhớ đệm
-        const mssvCheck = localStorage.getItem('saved_mssv');
-        const uniqueSubjects = {};
-        
-        // Tạo một vùng lưu trữ tạm thời để kiểm tra xem phòng thi/môn học đó có chứa MSSV hay không
-        const roomsValidForStudent = {};
+        var mssvCheck = localStorage.getItem('saved_mssv');
+        var uniqueSubjects = {};
+        var roomsValidForStudent = {};
+        var lines = examDatabaseRaw.trim().split('\n');
 
         if (mssvCheck) {
-            // Bước lọc trung gian: Xác định xem maCa nào có chứa sinh viên này
-            examDatabaseRaw.trim().split('\n').forEach(line => {
-                if (!line.trim()) return;
-                const parts = line.split('|');
+            for (var i = 0; i < lines.length; i++) {
+                if (lines[i].trim() === "") continue;
+                var parts = lines[i].split('|');
                 if (parts.length >= 11) {
-                    const maCaId = parts[0].trim();
-                    const masv   = parts[7].trim();
+                    var maCaId = parts[0].trim();
+                    var masv = parts[7].trim();
                     if (masv === mssvCheck.trim()) {
                         roomsValidForStudent[maCaId] = true;
                     }
                 }
-            });
+            }
         }
 
-        examDatabaseRaw.trim().split('\n').forEach(line => {
-            if (!line.trim()) return;
-            const parts = line.split('|');
+        for (var i = 0; i < lines.length; i++) {
+            if (lines[i].trim() === "") continue;
+            var parts = lines[i].split('|');
             if (parts.length >= 11) {
-                const maCaId   = parts[0].trim();
+                var maCaId = parts[0].trim();
                 
-                // LOGIC LỌC: Nếu ở chế độ Sinh viên mà mã ca này không chứa MSSV của bạn -> Bỏ qua toàn bộ dòng này
                 if (mssvCheck && !roomsValidForStudent[maCaId]) {
-                    return;
+                    continue;
                 }
 
-                const caThi    = parts[1].trim();
-                const tenMon   = parts[2].trim();
-                const ngayThi  = parts[3].trim();
-                const gioThi   = parts[4].trim();
-                const phongThi = parts[5].trim();
+                var caThi = parts[1].trim();
+                var tenMon = parts[2].trim();
+                var ngayThi = parts[3].trim();
+                var gioThi = parts[4].trim();
+                var phongThi = parts[5].trim();
                 
-                const student = {
+                var student = {
                     stt: parts[6].trim(),
                     masv: parts[7].trim(),
                     hoten: parts[8].trim(),
@@ -177,24 +170,30 @@
                 }
                 studentsMap[maCaId].push(student);
             }
-        });
+        }
 
-        subjectsList = Object.values(uniqueSubjects).map((item, index) => {
-            return { stt: index + 1, ...item };
-        });
+        var objValues = Object.values(uniqueSubjects);
+        subjectsList = [];
+        for (var i = 0; i < objValues.length; i++) {
+            subjectsList.push({ stt: i + 1, ...objValues[i] });
+        }
 
-        filteredData = [...subjectsList];
+        filteredData = [];
+        for (var i = 0; i < subjectsList.length; i++) {
+            filteredData.push(subjectsList[i]);
+        }
         renderTable();
     }
 
     function renderTable() {
-        const tbody = document.getElementById('subjectsBody');
+        var tbody = document.getElementById('subjectsBody');
         tbody.innerHTML = '';
-        const start = (currentPage - 1) * rowsPerPage;
-        const paginatedItems = filteredData.slice(start, start + rowsPerPage);
+        var start = (currentPage - 1) * rowsPerPage;
+        var paginatedItems = filteredData.slice(start, start + rowsPerPage);
 
-        paginatedItems.forEach(item => {
-            const tr = document.createElement('tr');
+        for (var i = 0; i < paginatedItems.length; i++) {
+            var item = paginatedItems[i];
+            var tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${item.stt}</td>
                 <td><strong>${item.name}</strong></td>
@@ -207,34 +206,55 @@
                 </td>
             `;
             tbody.appendChild(tr);
-        });
-        document.getElementById('pageInfo').innerText = `Trang ${currentPage} / ${Math.ceil(filteredData.length / rowsPerPage) || 1}`;
+        }
+        document.getElementById('pageInfo').innerText = "Trang " + currentPage + " / " + (Math.ceil(filteredData.length / rowsPerPage) || 1);
     }
 
     function searchSubjects() {
-        const filter = document.getElementById('searchInput').value.toUpperCase().trim();
+        var filter = document.getElementById('searchInput').value.toUpperCase().trim();
         
         if (!filter) {
-            filteredData = [...subjectsList];
+            filteredData = [];
+            for (var i = 0; i < subjectsList.length; i++) {
+                filteredData.push(subjectsList[i]);
+            }
         } else {
-            filteredData = subjectsList.filter(item => {
-                const matchSubjectName = item.name.toUpperCase().includes(filter);
-                const studentsInRoom = studentsMap[item.maCa] || [];
-                const matchStudentId = studentsInRoom.some(sv => sv.masv.toUpperCase().includes(filter));
-                return matchSubjectName || matchStudentId;
-            });
+            filteredData = [];
+            for (var i = 0; i < subjectsList.length; i++) {
+                var item = subjectsList[i];
+                var matchSubjectName = item.name.toUpperCase().indexOf(filter) > -1;
+                var studentsInRoom = studentsMap[item.maCa] || [];
+                var matchStudentId = false;
+                
+                for (var j = 0; j < studentsInRoom.length; j++) {
+                    if (studentsInRoom[j].masv.toUpperCase().indexOf(filter) > -1) {
+                        matchStudentId = true;
+                        break;
+                    }
+                }
+                
+                if (matchSubjectName || matchStudentId) {
+                    filteredData.push(item);
+                }
+            }
         }
         
-        filteredData = filteredData.map((item, index) => {
-            return { ...item, stt: index + 1 };
-        });
+        for (var i = 0; i < filteredData.length; i++) {
+            filteredData[i].stt = i + 1;
+        }
 
         currentPage = 1;
         renderTable();
     }
 
     function loadStudents(maCaId) {
-        const subjectInfo = subjectsList.find(i => i.maCa === maCaId);
+        var subjectInfo = null;
+        for (var i = 0; i < subjectsList.length; i++) {
+            if (subjectsList[i].maCa === maCaId) {
+                subjectInfo = subjectsList[i];
+                break;
+            }
+        }
         if (!subjectInfo) return;
 
         document.getElementById('mainPage').classList.remove('active-page');
@@ -242,24 +262,30 @@
         document.getElementById('backBtn').style.display = 'inline-block';
         document.getElementById('pageTitle').innerText = subjectInfo.name;
 
-        const statusArea = document.getElementById('statusArea');
-        const studentsBody = document.getElementById('studentsBody');
+        var statusArea = document.getElementById('statusArea');
+        var studentsBody = document.getElementById('studentsBody');
 
         studentsBody.innerHTML = '';
-        const listSV = studentsMap[maCaId] || [];
+        var listSV = studentsMap[maCaId] || [];
 
-        statusArea.innerHTML = `
-            <div>Phòng thi: <strong class="room-tag">${subjectInfo.phong}</strong> | Ca thi: <strong>${subjectInfo.ca} (${subjectInfo.gio})</strong> | Ngày thi: <strong>${subjectInfo.ngay}</strong></div>
-            <div>Tổng số sinh viên trong phòng: <strong>${listSV.length}</strong></div>
-        `;
+        statusArea.innerHTML = '<div>Phòng thi: <strong class="room-tag">' + subjectInfo.phong + '</strong> | Ca thi: <strong>' + subjectInfo.ca + ' (' + subjectInfo.gio + ')</strong> | Ngày thi: <strong>' + subjectInfo.ngay + '</strong></div><div>Tổng số sinh viên trong phòng: <strong>' + listSV.length + '</strong></div>';
 
-        listSV.sort((a, b) => parseInt(a.stt) - parseInt(b.stt));
+        for (var i = 0; i < listSV.length - 1; i++) {
+            for (var j = i + 1; j < listSV.length; j++) {
+                if (parseInt(listSV[i].stt) > parseInt(listSV[j].stt)) {
+                    var tam = listSV[i];
+                    listSV[i] = listSV[j];
+                    listSV[j] = tam;
+                }
+            }
+        }
 
-        listSV.forEach(sv => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${sv.stt}</td><td>${sv.masv}</td><td>${sv.hoten}</td><td>${sv.ngaysinh}</td><td>${sv.lopsh}</td>`;
+        for (var i = 0; i < listSV.length; i++) {
+            var sv = listSV[i];
+            var tr = document.createElement('tr');
+            tr.innerHTML = '<td>' + sv.stt + '</td><td>' + sv.masv + '</td><td>' + sv.hoten + '</td><td>' + sv.ngaysinh + '</td><td>' + sv.lopsh + '</td>';
             studentsBody.appendChild(tr);
-        });
+        }
     }
 
     function showMainPage() {
