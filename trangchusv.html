@@ -84,7 +84,7 @@
     <a href="./lophocphan.html" class="btn">Lớp Học Phần</a>
     <a href="./lichthi.html" class="btn">Danh Sách Thi</a>
     
-    <button class="btn" style="border: 1px dashed red; color: red;" onclick="thoatApp()">Quay lại ban đầu</button>
+    <button class="btn" style="border: 1px dashed red; color: red;" onclick="thoatApp()">VDUT</button>
 </div>
 
 <script>
@@ -94,7 +94,7 @@
     if (laKhach) {
         localStorage.removeItem('saved_mssv');
         localStorage.removeItem('saved_hoten');
-        document.getElementById('txtCheDo').innerText = "Chế độ: Khách (Xem toàn bộ)";
+        document.getElementById('txtCheDo').innerText = "Khách";
     } else {
         var mssvHienTai = localStorage.getItem('saved_mssv');
         var hoTenHienTai = localStorage.getItem('saved_hoten');
