@@ -44,12 +44,6 @@
             display: inline-block;
             border-radius: 4px;
         }
-        .bam-duoc {
-            cursor: pointer;
-        }
-        .bam-duoc:hover {
-            background-color: #eee;
-        }
         hr {
             width: 100%;
             border: 0;
@@ -77,51 +71,6 @@
             background-color: #000000;
             color: #ffffff;
         }
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-        .modal-box {
-            background-color: #ffffff;
-            padding: 20px;
-            border: 2px solid #000000;
-            width: 300px;
-            text-align: left;
-            border-radius: 4px;
-        }
-        .modal-title {
-            margin-top: 0;
-            font-size: 16px;
-            font-weight: bold;
-            border-bottom: 1px solid #000000;
-            padding-bottom: 5px;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-        .modal-content p {
-            margin: 8px 0;
-            font-size: 14px;
-        }
-        .modal-close-btn {
-            width: 100%;
-            padding: 8px 0;
-            background-color: #f2f2f2;
-            border: 1px solid #000000;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        .modal-close-btn:hover {
-            background-color: #e6e6e6;
-        }
     </style>
 </head>
 <body>
@@ -129,7 +78,7 @@
 <div class="container">
     <h1>VDUT</h1>
     <div class="subtitle">DUT - SUPERAPP</div>
-    <div class="thong-bao" id="txtCheDo" onclick="handleCheDoClick()">Đang tải...</div>
+    <div class="thong-bao" id="txtCheDo">Đang tải...</div>
     <hr>
 
     <a href="./lophocphan.html" class="btn">Lớp Học Phần</a>
@@ -138,85 +87,23 @@
     <button class="btn" style="border: 1px dashed red; color: red;" onclick="thoatApp()">VDUT</button>
 </div>
 
-<div id="studentModal" class="modal-overlay">
-    <div class="modal-box">
-        <div class="modal-title">THÔNG TIN SINH VIÊN</div>
-        <div class="modal-content">
-            <p><strong>Họ và tên:</strong> <span id="mdHoten"></span></p>
-            <p><strong>MSSV:</strong> <span id="mdMssv"></span></p>
-            <p><strong>Ngày sinh:</strong> <span id="mdNgaysinh"></span></p>
-            <p><strong>Email:</strong> <span id="mdEmail"></span></p>
-            <p><strong>Lớp:</strong> <span id="mdLop"></span></p>
-        </div>
-        <button class="modal-close-btn" onclick="closeModal()">ĐÓNG</button>
-    </div>
-</div>
-
-<script src="./database.js"></script>
-<script src="./databasethi.js"></script>
 <script>
     var thamSoUrl = new URLSearchParams(window.location.search);
     var laKhach = thamSoUrl.get('role') === 'khach';
-    var mssvHienTai = "";
-    var hoTenHienTai = "";
-    var tuDongNgaySinh = "Chưa cập nhật";
-    var tuDongLop = "Chưa cập nhật";
 
     if (laKhach) {
         localStorage.removeItem('saved_mssv');
         localStorage.removeItem('saved_hoten');
         document.getElementById('txtCheDo').innerText = "Khách";
     } else {
-        mssvHienTai = localStorage.getItem('saved_mssv');
-        hoTenHienTai = localStorage.getItem('saved_hoten');
+        var mssvHienTai = localStorage.getItem('saved_mssv');
+        var hoTenHienTai = localStorage.getItem('saved_hoten');
         
         if (!mssvHienTai) {
             window.location.href = './index.html';
         } else {
-            var el = document.getElementById('txtCheDo');
-            el.innerText = "Sinh viên: " + hoTenHienTai + " | MSSV: " + mssvHienTai;
-            el.classList.add('bam-duoc');
-            
-            if (typeof database !== 'undefined') {
-                var timKiemDb = database.find(function(item) {
-                    return item.mssv === mssvHienTai;
-                });
-                if (timKiemDb && timKiemDb.lopSH) {
-                    tuDongLop = timKiemDb.lopSH;
-                }
-            }
-            
-            if (typeof examDatabaseRaw !== 'undefined') {
-                var dongLichThi = examDatabaseRaw.split('\n');
-                for (var i = 0; i < dongLichThi.length; i++) {
-                    var cot = dongLichThi[i].split('|');
-                    if (cot.length >= 12) {
-                        var mssvThi = cot[7].trim();
-                        if (mssvThi === mssvHienTai) {
-                            tuDongNgaySinh = cot[9].trim();
-                            tuDongLop = cot[10].trim();
-                            break;
-                        }
-                    }
-                }
-            }
+            document.getElementById('txtCheDo').innerText = "Sinh viên: " + hoTenHienTai + " | MSSV: " + mssvHienTai;
         }
-    }
-
-    function handleCheDoClick() {
-        if (laKhach || !mssvHienTai) return;
-        
-        document.getElementById('mdHoten').innerText = hoTenHienTai;
-        document.getElementById('mdMssv').innerText = mssvHienTai;
-        document.getElementById('mdNgaysinh').innerText = tuDongNgaySinh;
-        document.getElementById('mdEmail').innerText = mssvHienTai + "@sv1.dut.udn.vn";
-        document.getElementById('mdLop').innerText = tuDongLop;
-        
-        document.getElementById('studentModal').style.display = 'flex';
-    }
-
-    function closeModal() {
-        document.getElementById('studentModal').style.display = 'none';
     }
 
     function thoatApp() {
