@@ -33,10 +33,16 @@
             letter-spacing: 1px;
         }
         .thong-bao {
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: bold;
             color: #000000;
             margin-bottom: 25px;
+            margin-top: 10px;
+            border: 1px solid #000;
+            padding: 8px 15px;
+            background-color: #f9f9f9;
+            display: inline-block;
+            border-radius: 4px;
         }
         hr {
             width: 100%;
@@ -59,6 +65,7 @@
             transition: all 0.2s ease;
             text-decoration: none;
             color: #000000;
+            box-sizing: border-box;
         }
         .btn:hover {
             background-color: #000000;
@@ -81,23 +88,27 @@
 </div>
 
 <script>
-    const thamSoUrl = new URLSearchParams(window.location.search);
-    const laKhach = thamSoUrl.get('role') === 'khach';
+    var thamSoUrl = new URLSearchParams(window.location.search);
+    var laKhach = thamSoUrl.get('role') === 'khach';
 
     if (laKhach) {
         localStorage.removeItem('saved_mssv');
+        localStorage.removeItem('saved_hoten');
         document.getElementById('txtCheDo').innerText = "Chế độ: Khách (Xem toàn bộ)";
     } else {
-        const mssvHienTai = localStorage.getItem('saved_mssv');
+        var mssvHienTai = localStorage.getItem('saved_mssv');
+        var hoTenHienTai = localStorage.getItem('saved_hoten');
+        
         if (!mssvHienTai) {
             window.location.href = './index.html';
         } else {
-            document.getElementById('txtCheDo').innerText = "Sinh viên: " + mssvHienTai;
+            document.getElementById('txtCheDo').innerText = "Sinh viên: " + hoTenHienTai + " | MSSV: " + mssvHienTai;
         }
     }
 
     function thoatApp() {
         localStorage.removeItem('saved_mssv');
+        localStorage.removeItem('saved_hoten');
         window.location.href = './index.html';
     }
 </script>
