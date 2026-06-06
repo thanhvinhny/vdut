@@ -11,7 +11,6 @@
             background-color: #ffffff;
             color: #000000;
         }
-        
         .btn-home-back {
             position: absolute;
             top: 20px;
@@ -31,7 +30,6 @@
         .btn-home-back:hover {
             background-color: #f0f0f0;
         }
-
         h1 {
             font-size: 24px;
             font-weight: bold;
@@ -118,7 +116,6 @@
             cursor: pointer;
             font-weight: bold;
         }
-
         .notice-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -242,26 +239,24 @@
     }
 
     function renderLHPTable() {
-        const tbody = document.querySelector("#lhpTable tbody");
+        var tbody = document.querySelector("#lhpTable tbody");
         tbody.innerHTML = "";
+        
+        var mssvCheck = localStorage.getItem('saved_mssv');
+        var uniqueLHP = [];
 
-        // Lấy MSSV được lưu từ trang chủ điều hướng (nếu có)
-        const mssvCheck = localStorage.getItem('saved_mssv');
-
-        const uniqueLHP = [];
-        for (let i = 0; i < database.length; i++) {
-            let item = database[i];
+        for (var i = 0; i < database.length; i++) {
+            var item = database[i];
             
-            // LOGIC LỌC: Nếu đang ở chế độ Sinh viên (có mssvCheck), môn nào không phải của MSSV này thì bỏ qua
             if (mssvCheck && item.mssv.toString().trim() !== mssvCheck.trim()) {
                 continue;
             }
 
-            let maChuanHoaItem = item.maLHP.replace(/\./g, '');
-            let daTonTai = false;
+            var maChuanHoaItem = item.maLHP.replace(/\./g, '');
+            var daTonTai = false;
             
-            for (let j = 0; j < uniqueLHP.length; j++) {
-                let maChuanHoaUnique = uniqueLHP[j].maLHP.replace(/\./g, '');
+            for (var j = 0; j < uniqueLHP.length; j++) {
+                var maChuanHoaUnique = uniqueLHP[j].maLHP.replace(/\./g, '');
                 if (maChuanHoaUnique === maChuanHoaItem) {
                     daTonTai = true;
                     break;
@@ -269,7 +264,15 @@
             }
             
             if (!daTonTai) {
-                let lichBoSung = typeof scheduleData !== 'undefined' ? scheduleData.find(s => s.maLHP.replace(/\./g, '') === maChuanHoaItem) : null;
+                var lichBoSung = null;
+                if (typeof scheduleData !== 'undefined') {
+                    for (var k = 0; k < scheduleData.length; k++) {
+                        if (scheduleData[k].maLHP.replace(/\./g, '') === maChuanHoaItem) {
+                            lichBoSung = scheduleData[k];
+                            break;
+                        }
+                    }
+                }
                 
                 uniqueLHP.push({
                     maLHP: item.maLHP,
@@ -281,8 +284,8 @@
             }
         }
 
-        for (let i = 0; i < uniqueLHP.length; i++) {
-            const tr = document.createElement("tr");
+        for (var i = 0; i < uniqueLHP.length; i++) {
+            var tr = document.createElement("tr");
             tr.innerHTML = `
                 <td class="text-center">${i + 1}</td>
                 <td>${uniqueLHP[i].tenMon}</td>
@@ -297,29 +300,28 @@
     }
 
     function filterTable() {
-        const input = document.getElementById("searchInput");
-        const filter = input.value.toUpperCase().replace(/\./g, '');
-        const table = document.getElementById("lhpTable");
-        const tr = table.getElementsByTagName("tr");
+        var input = document.getElementById("searchInput");
+        var filter = input.value.toUpperCase().replace(/\./g, '');
+        var table = document.getElementById("lhpTable");
+        var tr = table.getElementsByTagName("tr");
+        var currentSTT = 1;
 
-        let currentSTT = 1;
-
-        for (let i = 1; i < tr.length; i++) {
-            let tdMonHoc = tr[i].getElementsByTagName("td")[1];
-            let tdMaLHP = tr[i].getElementsByTagName("td")[2];
-            let tdLichHoc = tr[i].getElementsByTagName("td")[4];
-            let tdGiangVien = tr[i].getElementsByTagName("td")[5];
+        for (var i = 1; i < tr.length; i++) {
+            var tdMonHoc = tr[i].getElementsByTagName("td")[1];
+            var tdMaLHP = tr[i].getElementsByTagName("td")[2];
+            var tdLichHoc = tr[i].getElementsByTagName("td")[4];
+            var tdGiangVien = tr[i].getElementsByTagName("td")[5];
             
             if (tdMonHoc && tdMaLHP) {
-                let txtMonHoc = tdMonHoc.textContent || tdMonHoc.innerText;
-                let txtMaLHP = tdMaLHP.textContent || tdMaLHP.innerText;
-                let txtLichHoc = tdLichHoc ? (tdLichHoc.textContent || tdLichHoc.innerText) : "";
-                let txtGiangVien = tdGiangVien ? (tdGiangVien.textContent || tdGiangVien.innerText) : "";
-                let txtMaLHPChuanHoa = txtMaLHP.replace(/\./g, '');
-                
-                let matchesMSSV = false;
-                for (let j = 0; j < database.length; j++) {
-                    let dbMaChuanHoa = database[j].maLHP.replace(/\./g, '');
+                var txtMonHoc = tdMonHoc.textContent || tdMonHoc.innerText;
+                var txtMaLHP = tdMaLHP.textContent || tdMaLHP.innerText;
+                var txtLichHoc = tdLichHoc ? (tdLichHoc.textContent || tdLichHoc.innerText) : "";
+                var txtGiangVien = tdGiangVien ? (tdGiangVien.textContent || tdGiangVien.innerText) : "";
+                var txtMaLHPChuanHoa = txtMaLHP.replace(/\./g, '');
+                var matchesMSSV = false;
+
+                for (var j = 0; j < database.length; j++) {
+                    var dbMaChuanHoa = database[j].maLHP.replace(/\./g, '');
                     if (dbMaChuanHoa === txtMaLHPChuanHoa && database[j].mssv.toUpperCase().indexOf(filter) > -1) {
                         matchesMSSV = true;
                         break;
@@ -344,31 +346,31 @@
         document.getElementById("modalTitle").innerText = `DANH SÁCH SINH VIÊN PHÒNG THI - MÔN: ` + tenMon.toUpperCase();
         document.getElementById("modalSubTitle").innerText = `Mã LHP học phần: ` + maLHP;
 
-        let maLHPChuanHoaGoc = maLHP.replace(/\./g, '');
+        var maLHPChuanHoaGoc = maLHP.replace(/\./g, '');
+        var students = [];
 
-        let students = [];
-        for (let i = 0; i < database.length; i++) {
-            let maChuanHoaDb = database[i].maLHP.replace(/\./g, '');
+        for (var i = 0; i < database.length; i++) {
+            var maChuanHoaDb = database[i].maLHP.replace(/\./g, '');
             if (maChuanHoaDb === maLHPChuanHoaGoc) {
                 students.push(database[i]);
             }
         }
         
-        for (let i = 0; i < students.length - 1; i++) {
-            for (let j = i + 1; j < students.length; j++) {
+        for (var i = 0; i < students.length - 1; i++) {
+            for (var j = i + 1; j < students.length; j++) {
                 if (students[i].mssv > students[j].mssv) {
-                    let tam = students[i];
+                    var tam = students[i];
                     students[i] = students[j];
                     students[j] = tam;
                 }
             }
         }
 
-        const studentTbody = document.getElementById("studentTableBody");
+        var studentTbody = document.getElementById("studentTableBody");
         studentTbody.innerHTML = "";
 
-        for (let i = 0; i < students.length; i++) {
-            const tr = document.createElement("tr");
+        for (var i = 0; i < students.length; i++) {
+            var tr = document.createElement("tr");
             tr.innerHTML = `
                 <td class="text-center">${i + 1}</td>
                 <td>${students[i].mssv}</td>
@@ -386,7 +388,7 @@
     }
 
     window.onclick = function(event) {
-        const modal = document.getElementById("dssvModal");
+        var modal = document.getElementById("dssvModal");
         if (event.target == modal) {
             modal.style.display = "none";
         }
