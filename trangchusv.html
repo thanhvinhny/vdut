@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VDUT - Menu chính</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #ffffff;
+        }
+        .container {
+            text-align: center;
+            width: 90%;
+            max-width: 500px;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+            letter-spacing: 2px;
+        }
+        .subtitle {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .thong-bao {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #000000;
+            margin-bottom: 25px;
+        }
+        hr {
+            width: 100%;
+            border: 0;
+            border-top: 1px solid #ccc;
+            margin-bottom: 30px;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px 0;
+            margin: 15px 0;
+            font-size: 1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            background-color: #ffffff;
+            border: 2px solid #000000;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: #000000;
+        }
+        .btn:hover {
+            background-color: #000000;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>VDUT</h1>
+    <div class="subtitle">DUT - SUPERAPP</div>
+    <div class="thong-bao" id="txtCheDo">Đang tải...</div>
+    <hr>
+
+    <a href="./lophocphan.html" class="btn">Lớp Học Phần</a>
+    <a href="./lichthi.html" class="btn">Danh Sách Thi</a>
+    
+    <button class="btn" style="border: 1px dashed red; color: red;" onclick="thoatApp()">Quay lại ban đầu</button>
+</div>
+
+<script>
+    const thamSoUrl = new URLSearchParams(window.location.search);
+    const laKhach = thamSoUrl.get('role') === 'khach';
+
+    if (laKhach) {
+        localStorage.removeItem('saved_mssv');
+        document.getElementById('txtCheDo').innerText = "Chế độ: Khách (Xem toàn bộ)";
+    } else {
+        const mssvHienTai = localStorage.getItem('saved_mssv');
+        if (!mssvHienTai) {
+            window.location.href = './index.html';
+        } else {
+            document.getElementById('txtCheDo').innerText = "Sinh viên: " + mssvHienTai;
+        }
+    }
+
+    function thoatApp() {
+        localStorage.removeItem('saved_mssv');
+        window.location.href = './index.html';
+    }
+</script>
+
+</body>
+</html>
