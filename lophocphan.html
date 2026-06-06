@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VNY | DUT - LỚP HỌC PHẦN | Học kỳ hè (2025-2026)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #000000;
+        }
+        
+        .btn-home-back {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            background-color: #ffffff;
+            border: 1px solid #000000;
+            cursor: pointer;
+            text-decoration: none;
+            color: #000000;
+            transition: all 0.2s ease;
+        }
+        .btn-home-back:hover {
+            background-color: #f0f0f0;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding-left: 50px;
+            min-height: 35px;
+            display: flex;
+            align-items: center;
+        }
+        hr {
+            border: 0;
+            border-top: 1px solid #000;
+            margin-bottom: 20px;
+        }
+        .search-box {
+            width: 100%;
+            padding: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+            border: 1px solid #000000;
+            margin-bottom: 20px;
+        }
+        .search-box::placeholder {
+            color: #666;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #000000;
+            padding: 10px;
+            text-align: left;
+            font-size: 14px;
+        }
+        th {
+            font-weight: bold;
+            background-color: #ffffff;
+        }
+        .text-center {
+            text-align: center;
+            width: 60px;
+        }
+        .btn-view {
+            background-color: #ffffff;
+            color: #000000;
+            border: 1px solid #000000;
+            padding: 4px 12px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: normal;
+        }
+        .btn-view:hover {
+            background-color: #f0f0f0;
+        }
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border: 2px solid #000000;
+            width: 80%;
+            max-width: 750px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .notice-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999;
+        }
+        .notice-box {
+            background-color: #ffffff;
+            padding: 25px;
+            border: 2px solid #000000;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            text-align: left;
+        }
+        .notice-title {
+            margin-top: 0;
+            color: #bd1c1c;
+            font-size: 20px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .notice-body {
+            margin: 15px 0;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+        .notice-footer {
+            text-align: right;
+            margin-top: 15px;
+            font-style: italic;
+            color: #555;
+            font-size: 13px;
+        }
+        .btn-close-notice {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #000000;
+            color: #ffffff;
+            border: none;
+            font-weight: bold;
+            margin-top: 15px;
+            cursor: pointer;
+        }
+        .btn-close-notice:hover {
+            background-color: #333333;
+        }
+    </style>
+</head>
+<body>
+
+<div id="welcomeNotice" class="notice-overlay">
+    <div class="notice-box">
+        <h3 class="notice-title">THÔNG BÁO</h3>
+        <div class="notice-body">
+            <ul>
+                <li>Dữ liệu website chỉ để tham khảo, có thể không chính xác theo thời gian thực.</li>
+            </ul>
+        </div>
+        <button class="btn-close-notice" onclick="closeNotice()">Tôi đã hiểu</button>
+        <div class="notice-footer">@vny</div>
+    </div>
+</div>
+
+<a href="./trangchusv.html" class="btn-home-back" title="Quay lại Dut SuperApp">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+    </svg>
+</a>
+
+<h1>VNY | DUT - LỚP HỌC PHẦN | Học kỳ hè (2025-2026)</h1>
+<hr>
+
+<input type="text" id="searchInput" class="search-box" placeholder="Tìm kiếm theo MSSV*, tên môn học hoặc mã học phần..." onkeyup="filterTable()">
+
+<table id="lhpTable">
+    <thead>
+        <tr>
+            <th class="text-center">STT</th>
+            <th>Tên lớp học phần</th>
+            <th>Mã học phần</th>
+            <th>Tuần học</th>
+            <th>Lịch học</th>
+            <th>Giảng viên</th>
+            <th class="text-center">DSSV</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+<div id="dssvModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h2 id="modalTitle" style="font-size: 18px; margin-top: 0;">DANH SÁCH SINH VIÊN</h2>
+        <p id="modalSubTitle" style="font-size: 14px; margin-bottom: 15px; font-weight: bold;"></p>
+        <table>
+            <thead>
+                <tr>
+                    <th class="text-center">STT</th>
+                    <th>MSSV</th>
+                    <th>Họ và Tên</th>
+                    <th>Lớp HP</th>
+                </tr>
+            </thead>
+            <tbody id="studentTableBody">
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="database.js"></script>
+<script src="i4hocphan.js"></script>
+<script>
+    function closeNotice() {
+        document.getElementById("welcomeNotice").style.display = "none";
+    }
+
+    function renderLHPTable() {
+        const tbody = document.querySelector("#lhpTable tbody");
+        tbody.innerHTML = "";
+
+        // Lấy MSSV được lưu từ trang chủ điều hướng (nếu có)
+        const mssvCheck = localStorage.getItem('saved_mssv');
+
+        const uniqueLHP = [];
+        for (let i = 0; i < database.length; i++) {
+            let item = database[i];
+            
+            // LOGIC LỌC: Nếu đang ở chế độ Sinh viên (có mssvCheck), môn nào không phải của MSSV này thì bỏ qua
+            if (mssvCheck && item.mssv.toString().trim() !== mssvCheck.trim()) {
+                continue;
+            }
+
+            let maChuanHoaItem = item.maLHP.replace(/\./g, '');
+            let daTonTai = false;
+            
+            for (let j = 0; j < uniqueLHP.length; j++) {
+                let maChuanHoaUnique = uniqueLHP[j].maLHP.replace(/\./g, '');
+                if (maChuanHoaUnique === maChuanHoaItem) {
+                    daTonTai = true;
+                    break;
+                }
+            }
+            
+            if (!daTonTai) {
+                let lichBoSung = typeof scheduleData !== 'undefined' ? scheduleData.find(s => s.maLHP.replace(/\./g, '') === maChuanHoaItem) : null;
+                
+                uniqueLHP.push({
+                    maLHP: item.maLHP,
+                    tenMon: lichBoSung ? lichBoSung.tenMon : item.tenMon,
+                    tuanHoc: lichBoSung ? lichBoSung.tuanHoc : "-",
+                    lichHoc: lichBoSung ? lichBoSung.lichHoc : "-",
+                    giangVien: lichBoSung ? lichBoSung.giangVien : "-"
+                });
+            }
+        }
+
+        for (let i = 0; i < uniqueLHP.length; i++) {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td class="text-center">${i + 1}</td>
+                <td>${uniqueLHP[i].tenMon}</td>
+                <td>${uniqueLHP[i].maLHP}</td>
+                <td>${uniqueLHP[i].tuanHoc}</td>
+                <td>${uniqueLHP[i].lichHoc}</td>
+                <td>${uniqueLHP[i].giangVien}</td>
+                <td class="text-center"><button class="btn-view" onclick="viewDSSV('${uniqueLHP[i].maLHP}', '${uniqueLHP[i].tenMon}')">XEM</button></td>
+            `;
+            tbody.appendChild(tr);
+        }
+    }
+
+    function filterTable() {
+        const input = document.getElementById("searchInput");
+        const filter = input.value.toUpperCase().replace(/\./g, '');
+        const table = document.getElementById("lhpTable");
+        const tr = table.getElementsByTagName("tr");
+
+        let currentSTT = 1;
+
+        for (let i = 1; i < tr.length; i++) {
+            let tdMonHoc = tr[i].getElementsByTagName("td")[1];
+            let tdMaLHP = tr[i].getElementsByTagName("td")[2];
+            let tdLichHoc = tr[i].getElementsByTagName("td")[4];
+            let tdGiangVien = tr[i].getElementsByTagName("td")[5];
+            
+            if (tdMonHoc && tdMaLHP) {
+                let txtMonHoc = tdMonHoc.textContent || tdMonHoc.innerText;
+                let txtMaLHP = tdMaLHP.textContent || tdMaLHP.innerText;
+                let txtLichHoc = tdLichHoc ? (tdLichHoc.textContent || tdLichHoc.innerText) : "";
+                let txtGiangVien = tdGiangVien ? (tdGiangVien.textContent || tdGiangVien.innerText) : "";
+                let txtMaLHPChuanHoa = txtMaLHP.replace(/\./g, '');
+                
+                let matchesMSSV = false;
+                for (let j = 0; j < database.length; j++) {
+                    let dbMaChuanHoa = database[j].maLHP.replace(/\./g, '');
+                    if (dbMaChuanHoa === txtMaLHPChuanHoa && database[j].mssv.toUpperCase().indexOf(filter) > -1) {
+                        matchesMSSV = true;
+                        break;
+                    }
+                }
+                
+                if (txtMonHoc.toUpperCase().indexOf(filter) > -1 || 
+                    txtMaLHPChuanHoa.toUpperCase().indexOf(filter) > -1 || 
+                    txtLichHoc.toUpperCase().indexOf(filter) > -1 || 
+                    txtGiangVien.toUpperCase().indexOf(filter) > -1 || 
+                    matchesMSSV) {
+                    tr[i].style.display = "";
+                    tr[i].getElementsByTagName("td")[0].textContent = currentSTT++;
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+
+    function viewDSSV(maLHP, tenMon) {
+        document.getElementById("modalTitle").innerText = `DANH SÁCH SINH VIÊN PHÒNG THI - MÔN: ` + tenMon.toUpperCase();
+        document.getElementById("modalSubTitle").innerText = `Mã LHP học phần: ` + maLHP;
+
+        let maLHPChuanHoaGoc = maLHP.replace(/\./g, '');
+
+        let students = [];
+        for (let i = 0; i < database.length; i++) {
+            let maChuanHoaDb = database[i].maLHP.replace(/\./g, '');
+            if (maChuanHoaDb === maLHPChuanHoaGoc) {
+                students.push(database[i]);
+            }
+        }
+        
+        for (let i = 0; i < students.length - 1; i++) {
+            for (let j = i + 1; j < students.length; j++) {
+                if (students[i].mssv > students[j].mssv) {
+                    let tam = students[i];
+                    students[i] = students[j];
+                    students[j] = tam;
+                }
+            }
+        }
+
+        const studentTbody = document.getElementById("studentTableBody");
+        studentTbody.innerHTML = "";
+
+        for (let i = 0; i < students.length; i++) {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td class="text-center">${i + 1}</td>
+                <td>${students[i].mssv}</td>
+                <td>${students[i].hoTen}</td>
+                <td>${students[i].lopSH}</td>
+            `;
+            studentTbody.appendChild(tr);
+        }
+
+        document.getElementById("dssvModal").style.display = "flex";
+    }
+
+    function closeModal() {
+        document.getElementById("dssvModal").style.display = "none";
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById("dssvModal");
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    window.onload = renderLHPTable;
+</script>
+</body>
+</html>
